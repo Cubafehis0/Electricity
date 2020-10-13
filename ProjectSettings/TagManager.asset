@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - prickle
+  - map
+  - destination
+  - relay
   layers:
   - Default
   - TransparentFX
@@ -14,8 +18,8 @@ TagManager:
   - 
   - 
   - Map
-  - Player
-  - 
+  - Movable
+  - Relay
   - 
   - 
   - 

@@ -93,6 +93,7 @@ GameObject:
   - component: {fileID: 8628055210574272543}
   - component: {fileID: 8628055210574272542}
   - component: {fileID: 8628055210574272541}
+  - component: {fileID: -7022376087315667722}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Untagged
@@ -174,7 +175,7 @@ Animator:
   m_GameObject: {fileID: 8628055210574272540}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 09fcfe1fea1f9824185dd331d9af264f, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9c206a494a554894ba1f978e3641c2dc, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -217,7 +218,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8628055210574272540}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -230,3 +231,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &-7022376087315667722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628055210574272540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8020a419f92ee17489c6b8088623402f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropDustEffect: {fileID: 5979386018889241974, guid: b50151fa48432a24e8262ec47931a96d,
+    type: 3}
+  rig: {fileID: 8628055210574272541}
+  speed: {x: 0, y: 0}
