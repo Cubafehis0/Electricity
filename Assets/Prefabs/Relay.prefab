@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2988931137649831256}
   - component: {fileID: -2811039899089900311}
   - component: {fileID: 6140518052855679969}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Relay
   m_TagString: map
   m_Icon: {fileID: 0}
@@ -97,10 +97,10 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.006242752, y: 0.34623677}
+  m_Offset: {x: 0.006242752, y: -0.0026114583}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.1439969}
+    pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
@@ -108,7 +108,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.52509403, y: 0.6909076}
+  m_Size: {x: 0.52509403, y: 0.69090784}
   m_EdgeRadius: 0
 --- !u!50 &2988931137649831256
 Rigidbody2D:

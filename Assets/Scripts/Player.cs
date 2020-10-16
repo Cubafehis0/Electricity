@@ -12,8 +12,7 @@ public class Player : MonoBehaviour
         set;
         get;
     }
-
-    public bool IsOverlap
+    public bool IsOnPlat
     {
         set;
         get;
@@ -39,6 +38,20 @@ public class Player : MonoBehaviour
         set;
         get;
     } = false;
+    public int Layer
+    {
+        get;
+        set;
+    }
+
+
+    public bool isOnOther//一个在平台上，另一个相互重叠则都在平台上
+    {
+        set;
+        get;
+
+    }
+
 
     public Relay PickRelay
     {
@@ -51,6 +64,7 @@ public class Player : MonoBehaviour
         rig.MovePosition(speed * Time.deltaTime + (Vector2)rig.transform.position);
     }
 
+    
 
 
 

@@ -15,25 +15,30 @@ public class PlayerControl : MonoBehaviour
     public Relay[] relays = new Relay[4];
     int relaySize;
     private bool isFinishInitialDrop;//是否完成初始下落，没有则为false且不能操作。
-    
+    public LiftplatformMove[] liftPlats;
 
-    bool isDownW;
-    bool isDownUp;
     bool isDownS;
     bool isDownDown;
+
     int mapLayer;
     int relayLayer;
+
+    Animator animator1, animator2;
     private void Start()
     {
         isFinishInitialDrop = false;
         player1.IsFloat = true;
         player2.IsFloat = true;
+        player1.IsOnPlat = false;
+        player2.IsOnPlat = false;
         relayLayer = LayerMask.NameToLayer("Relay");
         mapLayer = LayerMask.NameToLayer("Map");
+        player1.Layer = LayerMask.NameToLayer("Player1");
+        player2.Layer = LayerMask.NameToLayer("Player2");
         player1.Collider2DExtents = player1.rig.GetComponent<Collider2D>().bounds.extents;
         player2.Collider2DExtents = player2.rig.GetComponent<Collider2D>().bounds.extents;
-        isDownUp = false;
-        isDownW = false;
+        animator1 = player1.transform.GetComponent<Animator>();
+        animator2 = player2.transform.GetComponent<Animator>();
         isDownS = false;
         isDownDown = false;
         relaySize = relays.Length;
@@ -41,23 +46,26 @@ public class PlayerControl : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        OnGroundCollision();
+        OnFloorCollision();
+        OnGroundCollision();//放在前面，在后面会跳不起来
+
+        if (!player1.IsReachDes && !player2.IsReachDes)
+            TVVerticalCollision();
+
+        CheckMapLayer();
         if (isFinishInitialDrop)
             Control();
-        CheckHorizontalCollision();
-        if (!player1.IsReachDes && !player2.IsReachDes)
-            TVCollision();
-        OnFloorCollision();
+        CheckHorizontalCollision();//在前面墙挡不住
+        if (!player1.IsReachDes  && !player2.IsReachDes)
+            TVHorizontalCollision();
+        Animanage();
+
         Move(player2);
         Move(player1);
     }
-   
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W))
-            isDownW = true;
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-            isDownUp = true;
         if (Input.GetKeyDown(KeyCode.DownArrow))
             isDownDown = true;
         if (Input.GetKeyDown(KeyCode.S))
@@ -67,58 +75,81 @@ public class PlayerControl : MonoBehaviour
     {
         GroundCollision(player1, mapLayer, "map");
         GroundCollision(player2, mapLayer, "map");
-        if(player1.IsFloat==true)
+        if (player1.IsFloat)
             GroundCollision(player1, relayLayer, "map");
-        if (player2.IsFloat == true) 
+        if (player2.IsFloat)
             GroundCollision(player2, relayLayer, "map");
+        if (player1.IsFloat)
+            GroundCollision(player1, mapLayer, "conveyBelt");
+        if (player2.IsFloat)
+            GroundCollision(player2, mapLayer, "conveyBelt");
+
     }
     void OnFloorCollision()
     {
-        if (player1.speed.y > 0)
+        if (player1.speed.y > 0)//防止电视机在传送带上互相穿过
         {
             FloorCollision(player1, mapLayer, "map");
             FloorCollision(player1, relayLayer, "map");
         }
-            
+
         if (player2.speed.y > 0)
         {
             FloorCollision(player2, mapLayer, "map");
             FloorCollision(player2, relayLayer, "map");
         }
-            
+
     }
-    void TVCollision()
+    void TVHorizontalCollision()
     {
-        player1.ColCen = player1.rig.GetComponent<Collider2D>().bounds.center;
-        player2.ColCen = player2.rig.GetComponent<Collider2D>().bounds.center;
-
-        if (Mathf.Abs(player1.ColCen.x - player2.ColCen.x) < player1.Collider2DExtents.x + player2.Collider2DExtents.x)
+        if (player1.speed.x < 0)
         {
-            if (Mathf.Abs(player1.ColCen.y - player2.ColCen.y) < player1.Collider2DExtents.y + player2.Collider2DExtents.y)
+            LeftCollision(player1, player2.Layer, "Player");
+        }
+        else if (player1.speed.x > 0)
+        {
+            RightCollision(player1, player2.Layer, "Player");
+        }
+        if (player2.speed.x < 0)
+        {
+            LeftCollision(player2, player1.Layer, "Player");
+        }
+        else if (player2.speed.x > 0)
+        {
+            RightCollision(player2, player1.Layer, "Player");
+        }
+        CheckConveyBelt(player1);
+        CheckConveyBelt(player2);
+
+    }
+    void CheckConveyBelt(Player player)
+    {
+        RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, mapLayer, (player.speed.y) * Time.deltaTime);
+        if(hit.collider!=null)
+        {
+            if (hit.collider.tag == "conveyBelt")
             {
-
-                if (Mathf.Abs(player1.ColCen.y + player1.speed.y * Time.deltaTime - player2.ColCen.y - player2.speed.y * Time.deltaTime) < Mathf.Abs(player1.ColCen.y - player2.ColCen.y))
-                {
-                    player1.speed.y = 0;
-                    player2.speed.y = 0;
-                    player1.IsOverlap = true;
-                    player2.IsOverlap = true;
-                }
-                else if (Mathf.Abs(player1.ColCen.x + player1.speed.x * Time.deltaTime - player2.ColCen.x - player2.speed.x * Time.deltaTime) < Mathf.Abs(player1.ColCen.x - player2.ColCen.x))
-                {
-                    player1.speed.x = 0;
-                    player2.speed.x = 0;
-                }
-
+                player.speed.x += 1.5f;
             }
-
         }
-        else
+    }
+    void TVVerticalCollision()
+    {
+        if (player1.IsFloat)
         {
-            player1.IsOverlap = false;
-            player2.IsOverlap = false;
+            GroundCollision(player1, player2.Layer, "Player");
         }
-        
+        if (player2.IsFloat)
+            GroundCollision(player2, player1.Layer, "Player");
+        if (player1.speed.y > 0)
+        {
+            FloorCollision(player1, player2.Layer, "Player");
+        }
+
+        if (player2.speed.y > 0)
+        { 
+            FloorCollision(player2, player1.Layer, "Player");
+        }
     }
     public void Move(Player player)
     {
@@ -129,8 +160,86 @@ public class PlayerControl : MonoBehaviour
         else player.speed.y = 0;
 
     }
+    void CheckMapLayer()
+    {
+        RaycastHit2D hit = CheckCollision.CheckDownCollison(player1.rig, mapLayer, 0.01f);
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "prickle")
+            {
+                GameStatus.IsAlive = false;
+            }
+        }
 
-   
+        hit = CheckCollision.CheckDownCollison(player2.rig, mapLayer, 0.01f);
+        if (hit.collider != null)
+        {
+            if (hit.collider.tag == "prickle")
+            {
+                GameStatus.IsAlive = false;
+            }
+        }
+
+        if(liftPlats.Length>0)
+        {
+            player1.IsOnPlat = false;
+            for (int i = 0; i < liftPlats.Length && !player1.IsOnPlat; i++)
+            {
+                liftPlats[i].OnLiftPlat(player1);
+            }
+
+            player2.IsOnPlat = false;
+            for (int i=0;i<liftPlats.Length && !player2.IsOnPlat;i++)
+            {
+                liftPlats[i].OnLiftPlat(player2);
+            }
+            if(player1.isOnOther && player2.IsOnPlat)
+            {
+                player1.speed.y = player2.speed.y;
+            }
+            if(player2.isOnOther && player1.IsOnPlat)
+            {
+                player2.speed.y = player1.speed.y;
+            }
+        }
+
+    }
+    void Animanage()
+    {
+        animator1.SetBool("isJump", false);
+        animator1.SetBool("isFaceRight", false);
+        animator1.SetBool("isFaceLeft", false);
+        if (player1.IsFloat)
+        {
+            animator1.SetBool("isJump", true);
+        }
+        else if (player1.speed.x > 0)
+        {
+            animator1.SetBool("isFaceRight", true);
+        }
+        else if (player1.speed.x < 0)
+        {
+            animator1.SetBool("isFaceLeft", true);
+        }
+
+
+        animator2.SetBool("isJump", false);
+        animator2.SetBool("isFaceRight", false);
+        animator2.SetBool("isFaceLeft", false);
+        if (player2.IsFloat)
+        {
+            animator2.SetBool("isJump", true);
+        }
+        else if (player2.speed.x > 0)
+        {
+            animator2.SetBool("isFaceRight", true);
+        }
+        else if (player2.speed.x < 0)
+        {
+            animator2.SetBool("isFaceLeft", true);
+        }
+
+    }
     void CheckHorizontalCollision()
     {
         if (player1.speed.x < 0)
@@ -156,7 +265,7 @@ public class PlayerControl : MonoBehaviour
     }
     void GroundCollision(Player player,int layerMask,string tag)
     {
-        RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, layerMask, Mathf.Abs(player.speed.y * Time.deltaTime));
+        RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, layerMask, Mathf.Abs(player.speed.y * Time.deltaTime)+0.01f);
         if (hit.collider != null)
         {
             if (hit.collider.tag == tag)
@@ -170,47 +279,56 @@ public class PlayerControl : MonoBehaviour
                 player.speed.y = (hit.point.y - player.rig.GetComponent<Collider2D>().bounds.center.y + player.Collider2DExtents.y) / Time.deltaTime;
                 player.IsFloat = false;
                 isFinishInitialDrop = true;
-            }
-        }
-        else player.IsFloat = true;
-        /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
-        Vector2 offSet = -player.Collider2DExtents;//坐标偏移量,左下角
-        Vector2 raySourseLeftDown = player.ColCen + offSet;//射线射出位置
-        RaycastHit2D hit = Physics2D.Raycast(raySourseLeftDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "map")
-            {
-                player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
-                if (player.speed.y < -20)
+                if (hit.collider.tag == player.tag)
                 {
-                    GameObject dropEffect = GameObject.Instantiate(player.dropDustEffect, player.transform.position + new Vector3(0.15f, -0.70f, 0), Quaternion.identity);
-                    GameObject.Destroy(dropEffect, 0.3f);
+                    player.isOnOther = true;
                 }
-                player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
-                player.IsFloat = false;
-                isFinishInitialDrop = true;
+                    
             }
-
         }
         else
         {
-
-            offSet = new Vector2(player.Collider2DExtents.x, -player.Collider2DExtents.y);
-            Vector2 raySourseRightDown = player.ColCen + offSet;
-            hit = Physics2D.Raycast(raySourseRightDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
+            player.isOnOther = false;
+            player.IsFloat = true;
+        }
+            /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
+            Vector2 offSet = -player.Collider2DExtents;//坐标偏移量,左下角
+            Vector2 raySourseLeftDown = player.ColCen + offSet;//射线射出位置
+            RaycastHit2D hit = Physics2D.Raycast(raySourseLeftDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
             if (hit.collider != null)
             {
                 if (hit.collider.tag == "map")
                 {
-                    player.speed.y = (hit.point.y - raySourseRightDown.y) / Time.deltaTime;
+                    player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
+                    if (player.speed.y < -20)
+                    {
+                        GameObject dropEffect = GameObject.Instantiate(player.dropDustEffect, player.transform.position + new Vector3(0.15f, -0.70f, 0), Quaternion.identity);
+                        GameObject.Destroy(dropEffect, 0.3f);
+                    }
+                    player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
                     player.IsFloat = false;
                     isFinishInitialDrop = true;
                 }
+
             }
-            else player.IsFloat = true;
-        }*/
-    }
+            else
+            {
+
+                offSet = new Vector2(player.Collider2DExtents.x, -player.Collider2DExtents.y);
+                Vector2 raySourseRightDown = player.ColCen + offSet;
+                hit = Physics2D.Raycast(raySourseRightDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
+                if (hit.collider != null)
+                {
+                    if (hit.collider.tag == "map")
+                    {
+                        player.speed.y = (hit.point.y - raySourseRightDown.y) / Time.deltaTime;
+                        player.IsFloat = false;
+                        isFinishInitialDrop = true;
+                    }
+                }
+                else player.IsFloat = true;
+            }*/
+        }
     void FloorCollision(Player player,int layerMask,string tag)
     {
         RaycastHit2D hit = CheckCollision.CheckUpCollison(player.rig, layerMask, Mathf.Abs(player.speed.y * Time.deltaTime));
@@ -219,7 +337,6 @@ public class PlayerControl : MonoBehaviour
             if (hit.collider.tag == tag)
             {
                 player.speed.y = 0;
-
             }
         }
         /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
@@ -289,8 +406,6 @@ public class PlayerControl : MonoBehaviour
         RaycastHit2D hit = CheckCollision.CheckRightCollison(player.rig, layerMask, Mathf.Abs(player.speed.x) * Time.deltaTime);
         if (hit.collider != null)
         {
-            Debug.Log(hit.collider);
-            Debug.Log(hit.collider.tag);
             if (hit.collider.tag == tag)
             {
                 
@@ -335,13 +450,19 @@ public class PlayerControl : MonoBehaviour
         else if (Input.GetKey(KeyCode.RightArrow))
             player1.speed.x = initialHorizontalSpeed;
         else player1.speed.x = 0;
-        if (!player1.IsFloat || player1.IsOverlap)
+        if (!player1.IsFloat)
         {
-            if (isDownUp)
+            /*if (isDownUp)
             {
+                Debug.Log("yes jump");
                 player1.speed.y = initialVerticalSpeed;
                 player1.IsFloat = true;
 
+            }*/
+            if(Input.GetKey(KeyCode.UpArrow))
+            {
+                player1.speed.y = initialVerticalSpeed;
+                player1.IsFloat = true;
             }
         }
         
@@ -356,9 +477,9 @@ public class PlayerControl : MonoBehaviour
             player2.speed.x = initialHorizontalSpeed;
         else player2.speed.x = 0;
 
-        if (!player2.IsFloat || player2.IsOverlap)
+        if (!player2.IsFloat)
         {
-            if (isDownW)
+            if (Input.GetKey(KeyCode.W))
             { 
                 player2.speed.y = initialVerticalSpeed;
                 player2.IsFloat = true;
@@ -368,9 +489,7 @@ public class PlayerControl : MonoBehaviour
         if (isDownS)
         {
             Pick(player2);
-        }
-        isDownW = false;
-        isDownUp = false;
+        }      
         isDownDown = false;
         isDownS = false;
     }
@@ -385,7 +504,7 @@ public class PlayerControl : MonoBehaviour
                 if (!relays[i].hasPick)
                 {
                     float distance = ((Vector2)(relays[i].rig.transform.position - player.transform.position)).magnitude;
-                    if ( distance< 2.0f)
+                    if ( distance< 1.5f)
                     {
                         if(distance<min)
                         {

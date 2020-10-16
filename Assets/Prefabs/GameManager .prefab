@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 7697342036348107038}
   - component: {fileID: 7697342036348107039}
   - component: {fileID: 7697342036348107024}
-  - component: {fileID: 7697342036348107025}
-  - component: {fileID: 7697342036348107026}
   - component: {fileID: 7697342036348107027}
   m_Layer: 0
   m_Name: 'GameManager '
@@ -47,14 +45,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b45c22b0b948ab04b9747a9c72f7faa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player1: {fileID: 0}
-  player2: {fileID: 0}
+  player1: {fileID: -6721539341503845824, guid: e323c2a9ca65df741bbc5fb3a44df308,
+    type: 3}
+  player2: {fileID: -7022376087315667722, guid: d188f0597567feb46b5765a642e6e532,
+    type: 3}
   initialHorizontalSpeed: 4
   initialVerticalSpeed: 12
   verticalAcc: 56
-  map: {fileID: 0}
   relays:
   - {fileID: 0}
+  liftPlats: []
 --- !u!114 &7697342036348107024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,34 +67,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dfe7232b21b9bf46a6a5a8aecda8956, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7697342036348107025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7697342036348107028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2273a581955c4a64a9f43fab82a2762c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player1: {fileID: 0}
-  player2: {fileID: 0}
---- !u!114 &7697342036348107026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7697342036348107028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c4ae9cbb2789dc4fa7175dcb626184f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player2: {fileID: 0}
-  player1: {fileID: 0}
 --- !u!114 &7697342036348107027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,10 +79,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4519648d356ee8428a048190e01831c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  palyer1: {fileID: 0}
-  player2: {fileID: 0}
+  palyer1: {fileID: 3769530635209190456, guid: e323c2a9ca65df741bbc5fb3a44df308, type: 3}
+  player2: {fileID: 8628055210574272537, guid: d188f0597567feb46b5765a642e6e532, type: 3}
   conductors:
-  - {fileID: 0}
+  - {fileID: 3769530635209190456, guid: e323c2a9ca65df741bbc5fb3a44df308, type: 3}
   - {fileID: 0}
   linkConductors:
   - {fileID: 0}
@@ -122,3 +94,8 @@ MonoBehaviour:
   liveTime: 3.5
   notLinkTime: 0
   distance: 3.5
+  simplePointNum: 14
+  bezierNum: 15
+  offSet: 0.1
+  width: 0.05
+  material: {fileID: 2100000, guid: 698322b7c5d8b2e4abfba53db8a08eda, type: 2}

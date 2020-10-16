@@ -8,6 +8,8 @@ TagManager:
   - map
   - destination
   - relay
+  - liftPlatform
+  - conveyBelt
   layers:
   - Default
   - TransparentFX
@@ -18,10 +20,10 @@ TagManager:
   - 
   - 
   - Map
-  - Movable
+  - Player1
+  - Player2
   - Relay
-  - 
-  - 
+  - Platform
   - 
   - 
   - 

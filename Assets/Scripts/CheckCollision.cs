@@ -28,9 +28,29 @@ public abstract class CheckCollision
             else
             {
                 offSet = new Vector2(0, collider.bounds.extents.y);
-                ray = collider2DCenter + offSet;//左上角的射线
+                ray = collider2DCenter + offSet;//中间的射线
                 hit = Physics2D.Raycast(ray, Vector2.up, distance, 1 << layerMask);
-                return hit;
+                if (hit.collider != null)
+                {
+                    return hit;
+                }
+                else
+                {
+                    offSet = new Vector2(-collider.bounds.extents.x/2, collider.bounds.extents.y);
+                    ray = collider2DCenter + offSet;//中间的射线
+                    hit = Physics2D.Raycast(ray, Vector2.up, distance, 1 << layerMask);
+                    if (hit.collider != null)
+                    {
+                        return hit;
+                    }
+                    else
+                    {
+                        offSet = new Vector2(collider.bounds.extents.x / 2, collider.bounds.extents.y);
+                        ray = collider2DCenter + offSet;//中间的射线
+                        hit = Physics2D.Raycast(ray, Vector2.up, distance, 1 << layerMask);
+                        return hit;
+                    }
+                }
             }
         }
        

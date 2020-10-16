@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8628055210155545784}
   - component: {fileID: 8628055210155545785}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: orna
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,9 +94,9 @@ GameObject:
   - component: {fileID: 8628055210574272542}
   - component: {fileID: 8628055210574272541}
   - component: {fileID: -7022376087315667722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

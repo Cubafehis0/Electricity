@@ -18,10 +18,13 @@ public class AnimationManage : MonoBehaviour
     void Update()
     {
         Animanage();
-        
+
     }
     void Animanage()
     {
+        animator1.SetBool("isJump", false);
+        animator1.SetBool("isFaceRight", false);
+        animator1.SetBool("isFaceLeft", false);
         if (player1.IsFloat)
         {
             animator1.SetBool("isJump", true);
@@ -34,14 +37,11 @@ public class AnimationManage : MonoBehaviour
         {
             animator1.SetBool("isFaceLeft", true);
         }
-        else
-        {
-            animator1.SetBool("isJump", false);
-            animator1.SetBool("isFaceRight", false);
-            animator1.SetBool("isFaceLeft", false);
-        }
 
 
+        animator2.SetBool("isJump", false);
+        animator2.SetBool("isFaceRight", false);
+        animator2.SetBool("isFaceLeft", false);
         if (player2.IsFloat)
         {
             animator2.SetBool("isJump", true);
@@ -54,12 +54,7 @@ public class AnimationManage : MonoBehaviour
         {
             animator2.SetBool("isFaceLeft", true);
         }
-        else
-        {
-            animator2.SetBool("isJump", false);
-            animator2.SetBool("isFaceRight", false);
-            animator2.SetBool("isFaceLeft", false);
-        }
+
     }
 
 
