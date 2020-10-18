@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class LiftplatformMove : MonoBehaviour
 {
-    public float minHeight;
-    public float maxHeight;
-    public float speed;
-    float curSpeed;
+    //控制传送带的移动，和与玩家的碰撞检测，附着在升降台上，并且被playerControl调用
+    public float minHeight;//最低高度
+    public float maxHeight;//最高高度
+    public float speed;//移动速度绝对值
+    float curSpeed;//移动速度
     Rigidbody2D rig;
     private void Start()
     {
@@ -20,9 +21,8 @@ public class LiftplatformMove : MonoBehaviour
         
     }
     
-    public void OnLiftPlat(Player player)
+    public void OnLiftPlat(Player player)//检测与玩家的碰撞
     {
-        
         RaycastHit2D hit = CheckCollision.CheckUpCollison(rig, player.Layer, 0.1f);
         if (hit.collider != null)
         {
@@ -33,7 +33,8 @@ public class LiftplatformMove : MonoBehaviour
         }
         else player.IsOnPlat = false;
     }
-    void Move()
+
+    void Move()//控制升降台的移动
     {
         Vector2 rigPos = rig.transform.position;
         if(rigPos.y>maxHeight)

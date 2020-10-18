@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 public class Destination : MonoBehaviour
 {
+    //判断玩家使否到达终点，附加在物体destination上；
     public Player player1;
     public Player player2;
     Vector2 player1Position;

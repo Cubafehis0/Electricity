@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
+    //根据两个玩家的位置控制镜头的移动，附加到摄像机上
     // Start is called before the first frame update
     public Transform player1;
     public Transform player2;
@@ -12,6 +13,6 @@ public class CameraMove : MonoBehaviour
     private void FixedUpdate()
     {
         tranlation = (player1.position + player2.position) / 2- carema.position;
-        carema.Translate(tranlation );
+        carema.Translate(tranlation);
     }
 }

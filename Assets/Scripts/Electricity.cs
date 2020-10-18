@@ -173,7 +173,7 @@ public class Electricity : MonoBehaviour
             }
         }
         mesh.triangles = triangles;
-        Graphics.DrawMesh(mesh, new Vector3(0, 0, 0), Quaternion.identity, material,1);
+        Graphics.DrawMesh(mesh, new Vector3(0, 0, -5), Quaternion.identity, material,0);
     }
     void Bezier(Vector2 endPos,Vector2 startPos,Vector3[] vertices)
     {
@@ -182,7 +182,9 @@ public class Electricity : MonoBehaviour
         Vector2 vectorLine = new Vector2(-line.y, line.x).normalized;
         float distance = line.magnitude;
         Vector2[] points = new Vector2[simplePointNum + 1];
-        for (int i = 0; i <= simplePointNum; i++)
+        points[0] = startPos;
+        points[simplePointNum] = endPos;
+        for (int i = 1; i < simplePointNum; i++)
         {
             float ratio = (float)i / simplePointNum;//比例
             float off = offSet * (float)(Random.value - 0.5) * distance;

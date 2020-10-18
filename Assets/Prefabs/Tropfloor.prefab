@@ -155,3 +155,4 @@ MonoBehaviour:
   - {x: 0.6, y: 0, z: 0}
   - {x: 0.3, y: 0.7, z: 0}
   baseForce: 200
+  brokenClip: {fileID: 8300000, guid: 7f6b3b80352653342a93ae7d842a67db, type: 3}

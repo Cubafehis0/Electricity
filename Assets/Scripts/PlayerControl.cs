@@ -6,24 +6,26 @@ using UnityEngine.UIElements;
 
 public class PlayerControl : MonoBehaviour
 {
-    public Player player1;
-    public Player player2;
+    //处理玩家的移动控制和碰撞检测
+    public Player player1;//玩家1
+    public Player player2;//玩家2
 
-    public float initialHorizontalSpeed;
-    public float initialVerticalSpeed;
-    public float verticalAcc;
-    public Relay[] relays = new Relay[4];
-    int relaySize;
+    public float initialHorizontalSpeed;//初始水平速度
+    public float initialVerticalSpeed;//初始垂直速度
+    public float verticalAcc;//垂直加速度
+    public Relay[] relays = new Relay[4];//记录场景继电器信息
     private bool isFinishInitialDrop;//是否完成初始下落，没有则为false且不能操作。
-    public LiftplatformMove[] liftPlats;
+    public LiftplatformMove[] liftPlats;//记录升降台信息
 
-    bool isDownS;
-    bool isDownDown;
+    bool isDownS;//控制拾取
+    bool isDownDown;//控制拾取
 
-    int mapLayer;
-    int relayLayer;
+    int mapLayer;//map层
+    int relayLayer;//继电器层
 
-    Animator animator1, animator2;
+    AudioSource audioSourse;
+    Animator animator1, animator2;//两个玩家的动画控制器
+    int relaySize;//继电器的数目
     private void Start()
     {
         isFinishInitialDrop = false;
@@ -42,13 +44,12 @@ public class PlayerControl : MonoBehaviour
         isDownS = false;
         isDownDown = false;
         relaySize = relays.Length;
-
+        audioSourse = GetComponent<AudioSource>();
     }
     private void FixedUpdate()
     {
         OnFloorCollision();
         OnGroundCollision();//放在前面，在后面会跳不起来
-
         if (!player1.IsReachDes && !player2.IsReachDes)
             TVVerticalCollision();
 
@@ -59,7 +60,6 @@ public class PlayerControl : MonoBehaviour
         if (!player1.IsReachDes  && !player2.IsReachDes)
             TVHorizontalCollision();
         Animanage();
-
         Move(player2);
         Move(player1);
     }
@@ -67,27 +67,28 @@ public class PlayerControl : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            isDownDown = true;
+            isDownDown = true;//监控DownArrow键是否按下
         if (Input.GetKeyDown(KeyCode.S))
-            isDownS = true;
+            isDownS = true;//监控S键是否按下
     }
     void OnGroundCollision()
     {
-        GroundCollision(player1, mapLayer, "map");
+        GroundCollision(player1, mapLayer, "map");//对地图层的碰撞检测
         GroundCollision(player2, mapLayer, "map");
         if (player1.IsFloat)
-            GroundCollision(player1, relayLayer, "map");
+            GroundCollision(player1, relayLayer, "map");//继电器层的碰撞检测
         if (player2.IsFloat)
             GroundCollision(player2, relayLayer, "map");
         if (player1.IsFloat)
-            GroundCollision(player1, mapLayer, "conveyBelt");
+            GroundCollision(player1, mapLayer, "conveyBelt");//对传送带的碰撞检测
         if (player2.IsFloat)
             GroundCollision(player2, mapLayer, "conveyBelt");
 
     }
     void OnFloorCollision()
     {
-        if (player1.speed.y > 0)//防止电视机在传送带上互相穿过
+        //顶部碰撞检测
+        if (player1.speed.y > 0)
         {
             FloorCollision(player1, mapLayer, "map");
             FloorCollision(player1, relayLayer, "map");
@@ -102,6 +103,7 @@ public class PlayerControl : MonoBehaviour
     }
     void TVHorizontalCollision()
     {
+        //玩家之间水平方向上的碰撞检测
         if (player1.speed.x < 0)
         {
             LeftCollision(player1, player2.Layer, "Player");
@@ -124,7 +126,8 @@ public class PlayerControl : MonoBehaviour
     }
     void CheckConveyBelt(Player player)
     {
-        RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, mapLayer, (player.speed.y) * Time.deltaTime);
+        //传送带加减速
+        RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, mapLayer, Mathf.Abs(player.speed.y)*Time.deltaTime+0.01f);
         if(hit.collider!=null)
         {
             if (hit.collider.tag == "conveyBelt")
@@ -135,6 +138,7 @@ public class PlayerControl : MonoBehaviour
     }
     void TVVerticalCollision()
     {
+        //玩家垂直方向的碰撞检测
         if (player1.IsFloat)
         {
             GroundCollision(player1, player2.Layer, "Player");
@@ -153,7 +157,7 @@ public class PlayerControl : MonoBehaviour
     }
     public void Move(Player player)
     {
-
+        //移动
         player.rig.MovePosition(player.speed * Time.deltaTime + (Vector2)player.rig.transform.position);
         if (player.IsFloat)
             player.speed.y -= verticalAcc * Time.deltaTime;
@@ -162,6 +166,7 @@ public class PlayerControl : MonoBehaviour
     }
     void CheckMapLayer()
     {
+        //地刺和升降台的碰撞检测
         RaycastHit2D hit = CheckCollision.CheckDownCollison(player1.rig, mapLayer, 0.01f);
         if (hit.collider != null)
         {
@@ -206,6 +211,7 @@ public class PlayerControl : MonoBehaviour
     }
     void Animanage()
     {
+        //动画管理
         animator1.SetBool("isJump", false);
         animator1.SetBool("isFaceRight", false);
         animator1.SetBool("isFaceLeft", false);
@@ -242,6 +248,7 @@ public class PlayerControl : MonoBehaviour
     }
     void CheckHorizontalCollision()
     {
+        //水平方向上碰撞检测
         if (player1.speed.x < 0)
         {
             LeftCollision(player1,mapLayer,"map");
@@ -265,6 +272,7 @@ public class PlayerControl : MonoBehaviour
     }
     void GroundCollision(Player player,int layerMask,string tag)
     {
+        //落地检测
         RaycastHit2D hit = CheckCollision.CheckDownCollison(player.rig, layerMask, Mathf.Abs(player.speed.y * Time.deltaTime)+0.01f);
         if (hit.collider != null)
         {
@@ -291,45 +299,8 @@ public class PlayerControl : MonoBehaviour
             player.isOnOther = false;
             player.IsFloat = true;
         }
-            /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
-            Vector2 offSet = -player.Collider2DExtents;//坐标偏移量,左下角
-            Vector2 raySourseLeftDown = player.ColCen + offSet;//射线射出位置
-            RaycastHit2D hit = Physics2D.Raycast(raySourseLeftDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
-            if (hit.collider != null)
-            {
-                if (hit.collider.tag == "map")
-                {
-                    player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
-                    if (player.speed.y < -20)
-                    {
-                        GameObject dropEffect = GameObject.Instantiate(player.dropDustEffect, player.transform.position + new Vector3(0.15f, -0.70f, 0), Quaternion.identity);
-                        GameObject.Destroy(dropEffect, 0.3f);
-                    }
-                    player.speed.y = (hit.point.y - raySourseLeftDown.y) / Time.deltaTime;
-                    player.IsFloat = false;
-                    isFinishInitialDrop = true;
-                }
-
-            }
-            else
-            {
-
-                offSet = new Vector2(player.Collider2DExtents.x, -player.Collider2DExtents.y);
-                Vector2 raySourseRightDown = player.ColCen + offSet;
-                hit = Physics2D.Raycast(raySourseRightDown, Vector2.down, Mathf.Abs(player.speed.y * Time.deltaTime), 1 << mapLayer);
-                if (hit.collider != null)
-                {
-                    if (hit.collider.tag == "map")
-                    {
-                        player.speed.y = (hit.point.y - raySourseRightDown.y) / Time.deltaTime;
-                        player.IsFloat = false;
-                        isFinishInitialDrop = true;
-                    }
-                }
-                else player.IsFloat = true;
-            }*/
-        }
-    void FloorCollision(Player player,int layerMask,string tag)
+    }
+    void FloorCollision(Player player,int layerMask,string tag)//顶部碰撞检测
     {
         RaycastHit2D hit = CheckCollision.CheckUpCollison(player.rig, layerMask, Mathf.Abs(player.speed.y * Time.deltaTime));
         if (hit.collider != null)
@@ -339,34 +310,9 @@ public class PlayerControl : MonoBehaviour
                 player.speed.y = 0;
             }
         }
-        /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
-        Vector2 offSet = player.Collider2DExtents;//坐标偏移量,右上角
-        Vector2 raySourseRightUp = player.ColCen + offSet;//射线射出位置
-        RaycastHit2D hit = Physics2D.Raycast(raySourseRightUp, Vector2.up, Mathf.Abs(player.speed.y) * Time.deltaTime, 1 << mapLayer);
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "map")
-            {
-                player.rig.MovePosition(hit.point - offSet);
-                player.speed.y = 0;
-            }
-        }
-        else
-        {
-            offSet = new Vector2(-player.Collider2DExtents.x, player.Collider2DExtents.y);
-            Vector2 raySourseLeftUp = player.ColCen + offSet;
-            hit = Physics2D.Raycast(raySourseLeftUp, Vector2.up, Mathf.Abs(player.speed.y) * Time.deltaTime, 1 << mapLayer);
-            if (hit.collider != null)
-            {
-                if (hit.collider.tag == "map")
-                {
-                    player.rig.MovePosition(hit.point - offSet);
-                    player.speed.y = 0;
-                }
-            }
-        }*/
+        
     }
-    void LeftCollision(Player player,int layerMask,string tag)
+    void LeftCollision(Player player,int layerMask,string tag)//左侧碰撞检测
     {
         RaycastHit2D hit = CheckCollision.CheckLeftCollison(player.rig, layerMask, Mathf.Abs(player.speed.x)*Time.deltaTime);
         if(hit.collider!=null)
@@ -374,34 +320,8 @@ public class PlayerControl : MonoBehaviour
             if(hit.collider.tag==tag)
                 player.speed.x = 0;
         }
-        /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
-        Vector2 offSet = new Vector2(-player.Collider2DExtents.x, -player.Collider2DExtents.y + 0.01f);//左下角
-        Vector2 raySoursLeftUp = player.ColCen + offSet;//射线射出位置
-        RaycastHit2D hit = Physics2D.Raycast(raySoursLeftUp, Vector2.left, Mathf.Abs(player.speed.x * Time.deltaTime), 1 << mapLayer);
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == "map")
-            {
-                player.rig.MovePosition(hit.point - offSet);
-                player.speed.x = 0;
-            }
-        }
-        else
-        {
-            offSet = new Vector2(-player.Collider2DExtents.x, player.Collider2DExtents.y - 0.01f);//左上角
-            Vector2 raySourseLeftDown = player.ColCen + offSet;
-            hit = Physics2D.Raycast(raySourseLeftDown, Vector2.left, Mathf.Abs(player.speed.x * Time.deltaTime), 1 << mapLayer);
-            if (hit.collider != null)
-            {
-                if (hit.collider.tag == "map")
-                {
-                    player.rig.MovePosition(hit.point - offSet);
-                    player.speed.x = 0;
-                }
-            }
-        }*/
     }
-    void RightCollision(Player player,int layerMask,string tag)
+    void RightCollision(Player player,int layerMask,string tag)//右侧碰撞检测
     {
         RaycastHit2D hit = CheckCollision.CheckRightCollison(player.rig, layerMask, Mathf.Abs(player.speed.x) * Time.deltaTime);
         if (hit.collider != null)
@@ -413,60 +333,26 @@ public class PlayerControl : MonoBehaviour
             }
                 
         }
-
-        /*player.ColCen = player.rig.GetComponent<Collider2D>().bounds.center;
-        Vector2 offSet = new Vector2(player.Collider2DExtents.x, -player.Collider2DExtents.y + 0.01f);//右下角
-        Vector2 ray = player.ColCen + offSet;//射线射出位置
-        RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.right, Mathf.Abs(player.speed.x * Time.deltaTime), 1 << layerMask);
-        if (hit.collider != null)
-        {
-            if (hit.collider.tag == tag)
-            {
-                player.rig.MovePosition(hit.point - offSet);
-                player.speed.x = 0;
-            }
-
-        }
-        else
-        {
-
-            offSet = new Vector2(player.Collider2DExtents.x, +player.Collider2DExtents.y - 0.01f);//右上角
-            ray = player.ColCen + offSet;
-            hit = Physics2D.Raycast(ray, Vector2.right, Mathf.Abs(player.speed.x * Time.deltaTime) + 0.01f, 1 << layerMask);
-            if (hit.collider != null)
-            {
-                if (hit.collider.tag == tag)
-                {
-                    player.rig.MovePosition(hit.point - offSet);
-                    player.speed.x = 0;
-                }
-            }
-        }*/
     }
     void Control()
     {
+        //人物控制
         if (Input.GetKey(KeyCode.LeftArrow))
             player1.speed.x = -initialHorizontalSpeed;
         else if (Input.GetKey(KeyCode.RightArrow))
             player1.speed.x = initialHorizontalSpeed;
         else player1.speed.x = 0;
-        if (!player1.IsFloat)
+        if (!player1.IsFloat)//跳跃
         {
-            /*if (isDownUp)
+            if (Input.GetKey(KeyCode.UpArrow))
             {
-                Debug.Log("yes jump");
-                player1.speed.y = initialVerticalSpeed;
-                player1.IsFloat = true;
-
-            }*/
-            if(Input.GetKey(KeyCode.UpArrow))
-            {
+                audioSourse.Play();
                 player1.speed.y = initialVerticalSpeed;
                 player1.IsFloat = true;
             }
         }
         
-        if (isDownDown)
+        if (isDownDown)//拾取
         {
             Pick(player1);
         }
@@ -477,16 +363,17 @@ public class PlayerControl : MonoBehaviour
             player2.speed.x = initialHorizontalSpeed;
         else player2.speed.x = 0;
 
-        if (!player2.IsFloat)
+        if (!player2.IsFloat)//跳跃
         {
             if (Input.GetKey(KeyCode.W))
-            { 
+            {
+                audioSourse.Play();
                 player2.speed.y = initialVerticalSpeed;
                 player2.IsFloat = true;
             }
         }
 
-        if (isDownS)
+        if (isDownS)//拾取
         {
             Pick(player2);
         }      
@@ -495,11 +382,12 @@ public class PlayerControl : MonoBehaviour
     }
     void Pick(Player player)
     {
+        //继电器的拾取
         if (!player.HasPick)
         {
             float min = 10f;
             int recentRigIndex =-1;
-            for (int i = 0; i < relaySize; i++)
+            for (int i = 0; i < relaySize; i++)//找到最近的继电器
             {
                 if (!relays[i].hasPick)
                 {
@@ -511,7 +399,6 @@ public class PlayerControl : MonoBehaviour
                             recentRigIndex = i;
                             min = distance;
                         }
-                            
                     }
                 } 
             }
@@ -529,7 +416,7 @@ public class PlayerControl : MonoBehaviour
                 }
                     
                 relays[recentRigIndex].picker = player;
-                relays[recentRigIndex].tag = "relay";
+                relays[recentRigIndex].tag = "relay";//relay便签不与玩家碰撞检测
                 //relays[recentRigIndex].transform.parent = player.transform;
                 player.HasPick = true;
                 player.PickRelay = relays[recentRigIndex];
@@ -539,10 +426,9 @@ public class PlayerControl : MonoBehaviour
         else
         {
             player.HasPick = false;
-            //player.PickRelay.transform.parent = map.transform;
-            player.PickRelay.tag = "map";
+            player.PickRelay.tag = "map";//改变为地图标签，恢复与玩家的碰撞检测
             player.PickRelay.hasPick = false;
-            player.PickRelay.speed.y = -3;
+            player.PickRelay.speed.y = -3;//给急待你其落下的速度
             
         }
     }

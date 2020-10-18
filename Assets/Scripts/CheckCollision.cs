@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class CheckCollision
 {
-
-    public static RaycastHit2D CheckUpCollison(Rigidbody2D rig, int layerMask,float distance)
+    //检测四个方向的碰撞
+    public static RaycastHit2D CheckUpCollison(Rigidbody2D rig, int layerMask,float distance)//向上方发出三条射线，检测是否有给定图层的物体
     {
         Collider2D collider = rig.GetComponent<Collider2D>();
         Vector2 collider2DCenter =collider.bounds.center;
@@ -56,7 +56,7 @@ public abstract class CheckCollision
        
     }
 
-    public static RaycastHit2D CheckDownCollison(Rigidbody2D rig, int layerMask, float distance)
+    public static RaycastHit2D CheckDownCollison(Rigidbody2D rig, int layerMask, float distance)//在下方发出三条射线，根据给定图层检测下方的物体
     {
         Collider2D collider = rig.GetComponent<Collider2D>();
         Vector2 collider2DCenter = collider.bounds.center;
@@ -85,11 +85,12 @@ public abstract class CheckCollision
             }
         }
     }
-    public static RaycastHit2D CheckLeftCollison(Rigidbody2D rig, int layerMask, float distance)
+    public static RaycastHit2D CheckLeftCollison(Rigidbody2D rig, int layerMask, float distance)//左侧发出两条射线，根据给定图层检测左方的物体
     {
         Collider2D collider = rig.GetComponent<Collider2D>();
         Vector2 collider2DCenter = collider.bounds.center;
         Vector2 offSet = new Vector2(-collider.bounds.extents.x, -collider.bounds.extents.y+0.01f); ;//坐标偏移量,左下角
+        //0.01f避免边缘情况
         Vector2 ray = collider2DCenter + offSet;//射线射出位置
         RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.left, distance, 1 << layerMask);
         if (hit.collider != null)
@@ -105,11 +106,12 @@ public abstract class CheckCollision
         }
     }
 
-    public static RaycastHit2D CheckRightCollison(Rigidbody2D rig, int layerMask, float distance)
+    public static RaycastHit2D CheckRightCollison(Rigidbody2D rig, int layerMask, float distance)//右方发出两条射线，根据给定图层检测右方的物体
     {
         Collider2D collider = rig.GetComponent<Collider2D>();
         Vector2 collider2DCenter = collider.bounds.center;
         Vector2 offSet = new Vector2(collider.bounds.extents.x, -collider.bounds.extents.y + 0.01f); ;//坐标偏移量,右下角
+        //0.01f避免边缘情况
         Vector2 ray = collider2DCenter + offSet;//射线射出位置
         RaycastHit2D hit = Physics2D.Raycast(ray, Vector2.right, distance, 1 << layerMask);
         if (hit.collider != null)
