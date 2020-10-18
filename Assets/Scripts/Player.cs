@@ -59,9 +59,4 @@ public class Player : MonoBehaviour
         get;
     } = null;
 
-
-    
-
-
-
 }
