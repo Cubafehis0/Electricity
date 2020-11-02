@@ -44,15 +44,11 @@ public class Player : MonoBehaviour
         get;
         set;
     }
-
-
     public bool isOnOther//一个玩家是否在另一个上面，此标记防止两个玩家在升降台上相互重叠的情况
     {
         set;
         get;
     }
-
-
     public Relay PickRelay//记录拾取的继电器
     {
         set;

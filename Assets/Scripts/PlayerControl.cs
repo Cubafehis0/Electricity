@@ -52,7 +52,6 @@ public class PlayerControl : MonoBehaviour
         OnGroundCollision();//放在前面，在后面会跳不起来
         if (!player1.IsReachDes && !player2.IsReachDes)
             TVVerticalCollision();
-
         CheckMapLayer();
         if (isFinishInitialDrop)
             Control();
